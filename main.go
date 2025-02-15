@@ -25,25 +25,36 @@ const (
 	invalidInputMsg   = "Invalid input! Please enter a valid number."
 )
 
-var (
-	totalAttempts int
-	answer        int
-	startTime     time.Time
-	minimumRange  int
-	maximumRange  int
-)
+type GameInfo struct {
+	TotalAttempts int
+	Answer        int
+	StartTime     time.Time
+	MinimumRange  int
+	MaximumRange  int
+}
 
 func main() {
-	cheering()
+	currentGameSession := initializeGame()
 	for {
-		difficultyChoosing()
-		getRandomNumber()
-		playGame()
-		if playAgain() == stopPlaying {
+		currentGameSession.TotalAttempts = difficultyChoosing()
+		getRandomNumber(&currentGameSession)
+		playGame(&currentGameSession)
+		if askToPlayAgain() == stopPlaying {
 			break
 		}
 	}
 	goodBye()
+}
+
+func initializeGame() GameInfo {
+	cheering()
+	return GameInfo{
+		TotalAttempts: 0,
+		Answer:        0,
+		StartTime:     time.Time{},
+		MinimumRange:  0,
+		MaximumRange:  100,
+	}
 }
 
 func cheering() {
@@ -69,6 +80,8 @@ func printLogo() {
 }
 
 func goodBye() {
+	clearScreen()
+	printLogo()
 	catArt := `  /\_/\  (
  ( ^.^ ) _)
    \"/  (
@@ -78,17 +91,13 @@ func goodBye() {
 	fmt.Printf("%v%v%v", cyanColor, catArt, resetColor)
 }
 
-func getRandomNumber() {
-	answer = rand.Intn(99) + 1
-	minimumRange = 0
-	maximumRange = 100
+func getRandomNumber(game *GameInfo) {
+	game.Answer = rand.Intn(99) + 1
+	game.MinimumRange = 0
+	game.MaximumRange = 100
 }
 
-func startTimer() {
-	startTime = time.Now()
-}
-
-func getElapsedTime() time.Duration {
+func getElapsedTime(startTime time.Time) time.Duration {
 	return time.Since(startTime)
 }
 
@@ -98,8 +107,8 @@ func formatTime(d time.Duration) string {
 	return fmt.Sprintf("%01d minutes and %01d seconds", minutes, seconds)
 }
 
-func difficultyChoosing() {
-	var difficultyChoice int
+func difficultyChoosing() int {
+	var difficultyChoice, totalAttempts int
 	var difficultyName, keyColor string
 
 	for {
@@ -144,6 +153,8 @@ func difficultyChoosing() {
 	fmt.Printf("\n%vGreat!%v %vYou have selected the %v%v%s%v %vdifficulty level.%v\n\n",
 		greenColor, resetColor, whiteColor, resetColor,
 		keyColor, difficultyName, resetColor, whiteColor, resetColor)
+
+	return totalAttempts
 }
 
 func getUserGuess(inputsList []int) int {
@@ -175,37 +186,38 @@ func getUserGuess(inputsList []int) int {
 	return input
 }
 
-func playGame() {
-	inputsList := make([]int, totalAttempts)
-	startTimer()
-	for attempt := 0; attempt < totalAttempts; attempt++ {
+func playGame(game *GameInfo) {
+	inputsList := make([]int, game.TotalAttempts)
+	game.StartTime = time.Now()
+	for attempt := 0; attempt < game.TotalAttempts; attempt++ {
 		input := getUserGuess(inputsList)
 		inputsList[attempt] = input
 
 		clearScreen()
 		printLogo()
-		if inputsList[attempt] == answer {
-			gameDuration := getElapsedTime()
 
-			fmt.Printf("%vCongratulations! You guessed the correct number in %v attempts and %v.\n%v", greenColor, attempt+1, formatTime(gameDuration), resetColor)
+		if input == game.Answer {
+			gameDuration := getElapsedTime(game.StartTime)
+			formatedTime := formatTime(gameDuration)
+			fmt.Printf("%vCongratulations! You guessed the correct number in %v attempts and %v.\n%v", greenColor, attempt+1, formatedTime, resetColor)
 			return
 		} else {
 			fmt.Printf("%vYour guess was: %d%v", whiteColor, input, resetColor)
-			provideHint(answer, inputsList[attempt])
+			provideHint(game, input)
 		}
 
-		remainingAttempts := totalAttempts - attempt - 1
+		remainingAttempts := game.TotalAttempts - attempt - 1
 
 		if remainingAttempts != 0 {
 			fmt.Printf("You have %v%d attempts%v left!\n\n", yellowColor, remainingAttempts, resetColor)
 		}
 
 		if remainingAttempts == 1 {
-			oddsOrEvenHint()
+			oddsOrEvenHint(game)
 		}
 
 	}
-	fmt.Printf("%vYou're out of chances.%v %v Nice try! The number to guess was %v%v%d%v\n\n", redColor, resetColor, whiteColor, resetColor, greenColor, answer, resetColor)
+	fmt.Printf("%vYou're out of chances.%v %v Nice try! The number to guess was %v%v%d%v\n\n", redColor, resetColor, whiteColor, resetColor, greenColor, game.Answer, resetColor)
 }
 
 func abs(x int) int {
@@ -215,37 +227,37 @@ func abs(x int) int {
 	return x
 }
 
-func playAgain() string {
+func askToPlayAgain() string {
 	fmt.Printf("%vDo you want to play another round?%v\n%v1. Yes%v\n%v2. No%v\n\n", cyanColor, resetColor, greenColor, resetColor, redColor, resetColor)
 	fmt.Printf("%vEnter your choice: %v", whiteColor, resetColor)
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
 	if scanner.Text() != continuePlaying && scanner.Text() != stopPlaying {
 		fmt.Printf("%vPlease enter 1 or 2.%v\n", redColor, resetColor)
-		return playAgain()
+		return askToPlayAgain()
 	}
 	return scanner.Text()
 }
 
-func oddsOrEvenHint() {
-	if answer%2 == 0 {
+func oddsOrEvenHint(game *GameInfo) {
+	if game.Answer%2 == 0 {
 		fmt.Printf("%vHint:%v the number is %veven.%v\n", greenColor, resetColor, greenColor, resetColor)
 	} else {
 		fmt.Printf("%vHint:%v the number is %vodd.%v\n", greenColor, redColor, greenColor, resetColor)
 	}
 }
 
-func provideHint(answer, input int) {
-	minimumRange, maximumRange = updateRange(minimumRange, maximumRange, input, answer)
-	if input < answer {
+func provideHint(game *GameInfo, input int) {
+	game.MinimumRange, game.MaximumRange = updateRange(game.MinimumRange, game.MaximumRange, input, game.Answer)
+	if input < game.Answer {
 		fmt.Printf("\n%vIncorrect!%v The number is %vgreater%v than %v.\n", redColor, resetColor, cyanColor, resetColor, input)
-	} else if input > answer {
+	} else if input > game.Answer {
 		fmt.Printf("\n%vIncorrect!%v The number is %vless%v than %v.\n", redColor, resetColor, cyanColor, resetColor, input)
 	}
 
-	printRange(minimumRange, maximumRange)
+	printRange(game.MinimumRange, game.MaximumRange)
 
-	if abs(input-answer) <= 3 {
+	if abs(input-game.Answer) <= 3 {
 		fmt.Printf("%vGetting hot! You're close!%v\n", magentaColor, resetColor)
 	}
 }
