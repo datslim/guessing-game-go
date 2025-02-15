@@ -28,6 +28,8 @@ var (
 	totalAttempts int
 	answer        int
 	startTime     time.Time
+	minimumRange  int
+	maximumRange  int
 )
 
 func main() {
@@ -63,11 +65,19 @@ func cheering() {
 }
 
 func goodBye() {
+	catArt := `  /\_/\  (
+ ( ^.^ ) _)
+   \"/  (
+ ( | | )
+(__d b__)`
 	fmt.Printf("%vSee you later! Hope you had a good time here!%v\n", magentaColor, resetColor)
+	fmt.Printf("%v%v%v", cyanColor, catArt, resetColor)
 }
 
 func getRandomNumber() {
 	answer = rand.Intn(99) + 1
+	minimumRange = 0
+	maximumRange = 100
 }
 
 func startTimer() {
@@ -100,7 +110,7 @@ func difficultyChoosing() {
 	}
 
 	if difficultyChoice < 1 || difficultyChoice > 3 {
-		fmt.Printf("%vPlease enter 1, 2 or 3.%v\n", redColor, resetColor)
+		fmt.Printf("\n%vPlease enter 1, 2 or 3.%v\n", redColor, resetColor)
 		difficultyChoosing()
 	}
 
@@ -156,6 +166,7 @@ func playGame() {
 			}
 			fmt.Printf("%vYou've already tried this number!%v\n", redColor, resetColor)
 		}
+
 		inputsList[attempt] = input
 
 		if inputsList[attempt] == answer {
@@ -166,13 +177,16 @@ func playGame() {
 			hintProvide(answer, inputsList[attempt])
 		}
 
-		if totalAttempts-attempt-1 != 0 {
-			fmt.Printf("You have %v%d attempts%v left!\n\n", yellowColor, totalAttempts-attempt-1, resetColor)
+		remainingAttempts := totalAttempts - attempt - 1
+
+		if remainingAttempts != 0 {
+			fmt.Printf("You have %v%d attempts%v left!\n\n", yellowColor, remainingAttempts, resetColor)
 		}
 
-		if totalAttempts-attempt-1 == 1 {
+		if remainingAttempts == 1 {
 			oddsOrEvenHint()
 		}
+
 	}
 	fmt.Printf("%vYou're out of chances.%v %v Nice try! The number to guess was %v%v%d%v\n\n", redColor, resetColor, whiteColor, resetColor, greenColor, answer, resetColor)
 }
@@ -205,11 +219,14 @@ func oddsOrEvenHint() {
 }
 
 func hintProvide(answer, input int) {
+	minimumRange, maximumRange = updateRange(minimumRange, maximumRange, input, answer)
 	if input < answer {
 		fmt.Printf("\n%vIncorrect!%v The number is %vgreater%v than %v.\n", redColor, resetColor, cyanColor, resetColor, input)
 	} else if input > answer {
 		fmt.Printf("\n%vIncorrect!%v The number is %vless%v than %v.\n", redColor, resetColor, cyanColor, resetColor, input)
 	}
+
+	printRange(minimumRange, maximumRange)
 
 	if abs(input-answer) <= 3 {
 		fmt.Printf("%vGetting hot! You're close!%v\n", magentaColor, resetColor)
@@ -223,4 +240,22 @@ func numberAlreadyTried(inputsList []int, input int) bool {
 		}
 	}
 	return false
+}
+
+func updateRange(min, max, input, answer int) (int, int) {
+	if input < answer {
+		if input > min {
+			min = input
+		}
+	} else if input > answer {
+		if input < max {
+			max = input
+		}
+	}
+	return min, max
+}
+
+func printRange(min, max int) {
+	rangeString := "✦━━━━━━━━━━━━━━━━━━━━━━✦"
+	fmt.Printf("%v %d %v %v %s %v %v %d%v\n", blueColor, min, resetColor, greenColor, rangeString, resetColor, blueColor, max, resetColor)
 }
