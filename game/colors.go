@@ -1,4 +1,4 @@
-package utils
+package game
 
 const (
 	resetColor   = "\033[0m"

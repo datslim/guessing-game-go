@@ -4,6 +4,15 @@ import (
 	"time"
 )
 
+const (
+	continuePlaying   = "1"
+	stopPlaying       = "2"
+	EASY_DIFFICULTY   = 1
+	MEDIUM_DIFFICULTY = 2
+	HARD_DIFFICULTY   = 3
+	invalidInputMsg   = "Invalid input! Please enter a valid number."
+)
+
 type GameInfo struct {
 	TotalAttempts int
 	Answer        int

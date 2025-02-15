@@ -14,8 +14,16 @@ func provideHint(game *GameInfo, input int) {
 
 	printRange(game.MinimumRange, game.MaximumRange)
 
-	if utils.Abs(input-game.Answer) <= 3 {
+	if abs(input-game.Answer) <= 3 {
 		fmt.Printf("%vGetting hot! You're close!%v\n", magentaColor, resetColor)
+	}
+}
+
+func oddsOrEvenHint(game *GameInfo) {
+	if game.Answer%2 == 0 {
+		fmt.Printf("%vHint:%v the number is %veven.%v\n", greenColor, resetColor, greenColor, resetColor)
+	} else {
+		fmt.Printf("%vHint:%v the number is %vodd.%v\n", greenColor, redColor, greenColor, resetColor)
 	}
 }
 
@@ -31,4 +39,15 @@ func numberAlreadyTried(inputsList []int, input int) bool {
 func printRange(min, max int) {
 	rangeString := "✦━━━━━━━━━━━━━━━━━━━━━━✦"
 	fmt.Printf("%v %d %v %v %s %v %v %d%v\n", blueColor, min, resetColor, greenColor, rangeString, resetColor, blueColor, max, resetColor)
+}
+
+func clearScreen() {
+	fmt.Print("\033[H\033[2J")
+}
+
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
 }

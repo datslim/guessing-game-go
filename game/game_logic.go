@@ -29,13 +29,13 @@ func playGame(game *GameInfo) {
 		input := getUserGuess(inputsList)
 		inputsList[attempt] = input
 
-		utils.ClearScreen()
+		clearScreen()
 		printLogo()
 
 		if input == game.Answer {
 			gameDuration := getElapsedTime(game.StartTime)
 			formatedTime := formatTime(gameDuration)
-			fmt.Printf("%vCongratulations! You guessed the correct number in %v attempts and %v.\n%v", greenColor, attempt+1, formatedTime, resetColor)
+			fmt.Printf("%vCongratulations! 🏆 You guessed the correct number in %v attempts and %v.\n%v", greenColor, attempt+1, formatedTime, resetColor)
 			return
 		} else {
 			fmt.Printf("%vYour guess was: %d%v", whiteColor, input, resetColor)
@@ -67,13 +67,4 @@ func updateRange(min, max, input, answer int) (int, int) {
 		}
 	}
 	return min, max
-}
-
-func numberAlreadyTried(inputsList []int, input int) bool {
-	for _, listValue := range inputsList {
-		if listValue == input {
-			return true
-		}
-	}
-	return false
 }
