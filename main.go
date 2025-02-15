@@ -22,6 +22,7 @@ const (
 	whiteColor        = "\033[97;1m"
 	yellowColor       = "\033[33;1m"
 	magentaColor      = "\033[35;1m"
+	invalidInputMsg   = "Invalid input! Please enter a valid number."
 )
 
 var (
@@ -99,63 +100,76 @@ func formatTime(d time.Duration) string {
 
 func difficultyChoosing() {
 	var difficultyChoice int
+	var difficultyName, keyColor string
 
-	fmt.Printf("%vSelect the difficulty level:%v\n%v1. Easy (10 chances)%v\n%v2. Medium (5 chances)%v\n%v3. Hard (3 chances)%v\n\n",
-		whiteColor, resetColor, greenColor, resetColor,
-		yellowColor, resetColor, redColor, resetColor)
+	for {
+		fmt.Printf("%vSelect the difficulty level:%v\n%v1. Easy (10 chances)%v\n%v2. Medium (5 chances)%v\n%v3. Hard (3 chances)%v\n\n",
+			whiteColor, resetColor, greenColor, resetColor,
+			yellowColor, resetColor, redColor, resetColor)
 
-	fmt.Printf("%vEnter your choice: %v", whiteColor, resetColor)
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
+		fmt.Printf("%vEnter your choice: %v", whiteColor, resetColor)
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan()
 
-	if n, err := fmt.Sscanf(scanner.Text(), "%d", &difficultyChoice); err != nil || n == 0 {
-		fmt.Printf("%vInvalid input! Please enter a valid difficulty.%v\n", redColor, resetColor)
-		difficultyChoosing()
+		if n, err := fmt.Sscanf(scanner.Text(), "%d", &difficultyChoice); err != nil || n == 0 {
+			fmt.Printf("%v%s%v\n", redColor, invalidInputMsg, resetColor)
+			continue //
+		}
+
+		if difficultyChoice < 1 || difficultyChoice > 3 {
+			fmt.Printf("\n%vPlease enter 1, 2 or 3.%v\n", redColor, resetColor)
+			continue //
+		}
+
+		break
 	}
 
-	if difficultyChoice < 1 || difficultyChoice > 3 {
-		fmt.Printf("\n%vPlease enter 1, 2 or 3.%v\n", redColor, resetColor)
-		difficultyChoosing()
-	}
-
-	var difficultyWord, keyColor string
 	switch difficultyChoice {
 	case EASY_DIFFICULTY:
 		totalAttempts = 10
-		difficultyWord = "Easy"
+		difficultyName = "Easy"
 		keyColor = greenColor
 
 	case MEDIUM_DIFFICULTY:
 		totalAttempts = 5
-		difficultyWord = "Medium"
+		difficultyName = "Medium"
 		keyColor = yellowColor
 
 	case HARD_DIFFICULTY:
 		totalAttempts = 3
-		difficultyWord = "Hard"
+		difficultyName = "Hard"
 		keyColor = redColor
 	}
+
 	fmt.Printf("\n%vGreat!%v %vYou have selected the %v%v%s%v %vdifficulty level.%v\n\n",
 		greenColor, resetColor, whiteColor, resetColor,
-		keyColor, difficultyWord, resetColor, whiteColor, resetColor)
-
+		keyColor, difficultyName, resetColor, whiteColor, resetColor)
 }
 
-func getAnInputValue() int {
+func getUserGuess(inputsList []int) int {
 	var input int
-	fmt.Printf("%vEnter your guess: %v", blueColor, resetColor)
+	for {
+		fmt.Printf("%vEnter your guess: %v", blueColor, resetColor)
 
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan()
 
-	if n, err := fmt.Sscanf(scanner.Text(), "%d", &input); err != nil || n == 0 {
-		fmt.Printf("%vInvalid input! Please enter a valid number.%v\n", redColor, resetColor)
-		return getAnInputValue()
-	}
+		if n, err := fmt.Sscanf(scanner.Text(), "%d", &input); err != nil || n == 0 {
+			fmt.Printf("%v%s%v\n", redColor, invalidInputMsg, resetColor)
+			continue
+		}
 
-	if input < 1 || input > 99 {
-		fmt.Printf("%vPlease enter a number%v %vbetween 1 and 100.%v\n", whiteColor, resetColor, redColor, resetColor)
-		return getAnInputValue()
+		if input < 1 || input > 99 {
+			fmt.Printf("%vPlease enter a number%v %vbetween 1 and 100.%v\n", whiteColor, resetColor, redColor, resetColor)
+			continue
+		}
+
+		if numberAlreadyTried(inputsList, input) {
+			fmt.Printf("%vYou've already tried this number!%v\n", redColor, resetColor)
+			continue
+		}
+
+		break
 	}
 
 	return input
@@ -165,28 +179,19 @@ func playGame() {
 	inputsList := make([]int, totalAttempts)
 	startTimer()
 	for attempt := 0; attempt < totalAttempts; attempt++ {
-		var input int
-		for {
-			input = getAnInputValue()
-			if !numberAlreadyTried(inputsList, input) {
-				break
-			}
-			fmt.Printf("%vYou've already tried this number!%v\n", redColor, resetColor)
-		}
-
+		input := getUserGuess(inputsList)
 		inputsList[attempt] = input
 
+		clearScreen()
+		printLogo()
 		if inputsList[attempt] == answer {
 			gameDuration := getElapsedTime()
-			clearScreen()
-			printLogo()
+
 			fmt.Printf("%vCongratulations! You guessed the correct number in %v attempts and %v.\n%v", greenColor, attempt+1, formatTime(gameDuration), resetColor)
 			return
 		} else {
-			clearScreen()
-			printLogo()
 			fmt.Printf("%vYour guess was: %d%v", whiteColor, input, resetColor)
-			hintProvide(answer, inputsList[attempt])
+			provideHint(answer, inputsList[attempt])
 		}
 
 		remainingAttempts := totalAttempts - attempt - 1
@@ -230,7 +235,7 @@ func oddsOrEvenHint() {
 	}
 }
 
-func hintProvide(answer, input int) {
+func provideHint(answer, input int) {
 	minimumRange, maximumRange = updateRange(minimumRange, maximumRange, input, answer)
 	if input < answer {
 		fmt.Printf("\n%vIncorrect!%v The number is %vgreater%v than %v.\n", redColor, resetColor, cyanColor, resetColor, input)
