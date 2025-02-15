@@ -47,7 +47,6 @@ func main() {
 
 func cheering() {
 	printLogo()
-
 	fmt.Printf("%vWelcome to the%v %vNumber Guessing Game!%v\n%vI'm thinking of a number between%v %v1 and 100.%v\n",
 		whiteColor, resetColor, cyanColor, resetColor,
 		whiteColor, resetColor, greenColor, resetColor)
@@ -100,6 +99,7 @@ func formatTime(d time.Duration) string {
 
 func difficultyChoosing() {
 	var difficultyChoice int
+
 	fmt.Printf("%vSelect the difficulty level:%v\n%v1. Easy (10 chances)%v\n%v2. Medium (5 chances)%v\n%v3. Hard (3 chances)%v\n\n",
 		whiteColor, resetColor, greenColor, resetColor,
 		yellowColor, resetColor, redColor, resetColor)
@@ -118,23 +118,26 @@ func difficultyChoosing() {
 		difficultyChoosing()
 	}
 
+	var difficultyWord, keyColor string
 	switch difficultyChoice {
 	case EASY_DIFFICULTY:
 		totalAttempts = 10
-		fmt.Printf("\n%vGreat!%v %vYou have selected the %v%vEasy%v %vdifficulty level.%v\n\n",
-			greenColor, resetColor, whiteColor, resetColor,
-			greenColor, resetColor, whiteColor, resetColor)
+		difficultyWord = "Easy"
+		keyColor = greenColor
+
 	case MEDIUM_DIFFICULTY:
 		totalAttempts = 5
-		fmt.Printf("\n%vGreat!%v %vYou have selected the %v%vMedium%v %vdifficulty level.%v\n\n",
-			greenColor, resetColor, whiteColor, resetColor,
-			yellowColor, resetColor, whiteColor, resetColor)
+		difficultyWord = "Medium"
+		keyColor = yellowColor
+
 	case HARD_DIFFICULTY:
 		totalAttempts = 3
-		fmt.Printf("\n%vGreat!%v %vYou have selected the %v%vHard%v %vdifficulty level.%v\n\n",
-			greenColor, resetColor, whiteColor, resetColor,
-			redColor, resetColor, whiteColor, resetColor)
+		difficultyWord = "Hard"
+		keyColor = redColor
 	}
+	fmt.Printf("\n%vGreat!%v %vYou have selected the %v%v%s%v %vdifficulty level.%v\n\n",
+		greenColor, resetColor, whiteColor, resetColor,
+		keyColor, difficultyWord, resetColor, whiteColor, resetColor)
 
 }
 
