@@ -96,7 +96,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Acknowledgments 🙏
 
 - Made with ❤️ by [Matvey Grachev](https://github.com/datslim).
-- Inspired by classic number guessing games.
+- Inspired by classic number guessing games and [roadmap website!](https://roadmap.sh/projects/number-guessing-game)
 
 ---
 
