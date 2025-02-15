@@ -46,14 +46,7 @@ func main() {
 }
 
 func cheering() {
-	art := `
-  _______ _______ _______ _______ _______        _______ _______ _______ _______ 
-|     __|   |   |    ___|     __|     __|______|     __|   _   |   |   |    ___|
-|    |  |   |   |    ___|__     |__     |______|    |  |       |       |    ___|
-|_______|_______|_______|_______|_______|      |_______|___|___|__|_|__|_______|
-                                                                                `
-	fmt.Printf("%v%v\n%v", cyanColor, art, resetColor)
-	fmt.Printf("\t\t\t\t%vMade by github.com/datslim%v\n\n", redColor, resetColor)
+	printLogo()
 
 	fmt.Printf("%vWelcome to the%v %vNumber Guessing Game!%v\n%vI'm thinking of a number between%v %v1 and 100.%v\n",
 		whiteColor, resetColor, cyanColor, resetColor,
@@ -62,6 +55,17 @@ func cheering() {
 		whiteColor, resetColor, blueColor, resetColor, whiteColor,
 		resetColor, blueColor, resetColor, whiteColor, resetColor)
 
+}
+
+func printLogo() {
+	art := `
+  _______ _______ _______ _______ _______        _______ _______ _______ _______ 
+|     __|   |   |    ___|     __|     __|______|     __|   _   |   |   |    ___|
+|    |  |   |   |    ___|__     |__     |______|    |  |       |       |    ___|
+|_______|_______|_______|_______|_______|      |_______|___|___|__|_|__|_______|
+                                                                                `
+	fmt.Printf("%v%v\n%v", cyanColor, art, resetColor)
+	fmt.Printf("\t\t\t\t%vMade by github.com/datslim%v\n\n", redColor, resetColor)
 }
 
 func goodBye() {
@@ -171,9 +175,14 @@ func playGame() {
 
 		if inputsList[attempt] == answer {
 			gameDuration := getElapsedTime()
+			clearScreen()
+			printLogo()
 			fmt.Printf("%vCongratulations! You guessed the correct number in %v attempts and %v.\n%v", greenColor, attempt+1, formatTime(gameDuration), resetColor)
 			return
 		} else {
+			clearScreen()
+			printLogo()
+			fmt.Printf("%vYour guess was: %d%v", whiteColor, input, resetColor)
 			hintProvide(answer, inputsList[attempt])
 		}
 
@@ -258,4 +267,8 @@ func updateRange(min, max, input, answer int) (int, int) {
 func printRange(min, max int) {
 	rangeString := "✦━━━━━━━━━━━━━━━━━━━━━━✦"
 	fmt.Printf("%v %d %v %v %s %v %v %d%v\n", blueColor, min, resetColor, greenColor, rangeString, resetColor, blueColor, max, resetColor)
+}
+
+func clearScreen() {
+	fmt.Print("\033[H\033[2J")
 }
