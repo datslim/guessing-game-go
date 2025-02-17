@@ -35,17 +35,17 @@ func playGame(game *GameInfo) {
 		if input == game.Answer {
 			gameDuration := getElapsedTime(game.StartTime)
 			formatedTime := formatTime(gameDuration)
-			fmt.Printf("%vCongratulations! 🏆 You guessed the correct number in %v attempts and %v.\n%v", greenColor, attempt+1, formatedTime, resetColor)
+			fmt.Fprintf(out, "%vCongratulations! 🏆 You guessed the correct number in %v attempts and %v.\n%v", greenColor, attempt+1, formatedTime, resetColor)
 			return
 		} else {
-			fmt.Printf("%vYour guess was: %d%v", whiteColor, input, resetColor)
+			fmt.Fprintf(out, "%vYour guess was: %d%v", whiteColor, input, resetColor)
 			provideHint(game, input)
 		}
 
 		remainingAttempts := game.TotalAttempts - attempt - 1
 
 		if remainingAttempts != 0 {
-			fmt.Printf("You have %v%d attempts%v left!\n\n", yellowColor, remainingAttempts, resetColor)
+			fmt.Fprintf(out, "You have %v%d attempts%v left!\n\n", yellowColor, remainingAttempts, resetColor)
 		}
 
 		if remainingAttempts == 1 {
@@ -53,7 +53,7 @@ func playGame(game *GameInfo) {
 		}
 
 	}
-	fmt.Printf("%vYou're out of chances.%v %v Nice try! The number to guess was %v%v%d%v\n\n", redColor, resetColor, whiteColor, resetColor, greenColor, game.Answer, resetColor)
+	fmt.Fprintf(out, "%vYou're out of chances.%v %v Nice try! The number to guess was %v%v%d%v\n\n", redColor, resetColor, whiteColor, resetColor, greenColor, game.Answer, resetColor)
 }
 
 func updateRange(min, max, input, answer int) (int, int) {

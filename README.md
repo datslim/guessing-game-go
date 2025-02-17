@@ -95,6 +95,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Acknowledgments 🙏
 
+- Huge thanks to [mattn](https://github.com/mattn) for making [go-colorable](https://github.com/mattn/go-colorable/tree/master) which makes my game run better on Windows OSs!
 - Made with ❤️ by [Matvey Grachev](https://github.com/datslim).
 - Inspired by classic number guessing games and [roadmap website!](https://roadmap.sh/projects/number-guessing-game)
 
