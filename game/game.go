@@ -22,6 +22,7 @@ type GameInfo struct {
 }
 
 func StartGame() {
+	cheering()
 	currentGameSession := initializeGame()
 	for {
 		currentGameSession.TotalAttempts = difficultyChoosing()
@@ -35,7 +36,6 @@ func StartGame() {
 }
 
 func initializeGame() GameInfo {
-	cheering()
 	return GameInfo{
 		TotalAttempts: 0,
 		Answer:        0,
