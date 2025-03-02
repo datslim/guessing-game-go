@@ -134,5 +134,5 @@ func goodBye() {
  ( | | )
 (__d b__)`
 	fmt.Fprintf(out, "%vSee you later! Hope you had a good time here!%v\n", magentaColor, resetColor)
-	fmt.Fprintf(out, "%v%v%v", cyanColor, catArt, resetColor)
+	fmt.Fprintf(out, "%v%v%v\n", cyanColor, catArt, resetColor)
 }
